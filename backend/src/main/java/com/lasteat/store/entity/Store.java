@@ -33,6 +33,7 @@ public class Store extends BaseTimeEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	// 운영자가 직접 등록한 가게는 사장님 계정이 없을 수 있음
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "owner_id")
 	private Member owner;
