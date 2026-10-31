@@ -4,7 +4,7 @@
 > 기준 화면: 손님 앱 UI 초안 7개 화면, 사장님 앱 UI (`Owner` 브랜치).
 > Sprint 2부터 컨트롤러를 구현하면서 Swagger(springdoc)로 옮겨 간다. 구현된 API는 Swagger가 기준이다.
 
-**인증 표시** 🔓 로그인 없이 · 🔑 로그인 필요 · 🏪 사장님 로그인 필요
+**인증** 공개: 로그인 없이 가능 · 로그인: 로그인 필요 · 사장님: 사장님 계정 로그인 필요
 **Base URL** `/api/v1` · 응답 형식·페이지·날짜 규칙은 [공통 규칙](#common)
 
 ## 한눈에 보기
@@ -12,45 +12,45 @@
 | 메서드 | 경로 | 설명 | 인증 | 화면 |
 |---|---|---|:-:|---|
 | **인증·회원** | | | | |
-| POST | [`/auth/kakao`](#auth-kakao) | 카카오 로그인 (첫 로그인 시 가입) | 🔓 | 마이 |
-| POST | [`/auth/refresh`](#auth-refresh) | 토큰 재발급 | 🔓 | 공통 |
-| POST | [`/auth/logout`](#auth-logout) | 로그아웃 | 🔑 | 마이 |
-| GET | [`/members/me`](#members-me) | 내 정보 | 🔑 | 마이 |
-| PATCH | [`/members/me/fcm-token`](#members-fcm) | 푸시 토큰 갱신 | 🔑 | 공통 |
-| DELETE | [`/members/me`](#members-delete) | 회원 탈퇴 | 🔑 | 마이 |
+| POST | [`/auth/kakao`](#auth-kakao) | 카카오 로그인 (첫 로그인 시 가입) | 공개 | 마이 |
+| POST | [`/auth/refresh`](#auth-refresh) | 토큰 재발급 | 공개 | 공통 |
+| POST | [`/auth/logout`](#auth-logout) | 로그아웃 | 로그인 | 마이 |
+| GET | [`/members/me`](#members-me) | 내 정보 | 로그인 | 마이 |
+| PATCH | [`/members/me/fcm-token`](#members-fcm) | 푸시 토큰 갱신 | 로그인 | 공통 |
+| DELETE | [`/members/me`](#members-delete) | 회원 탈퇴 | 로그인 | 마이 |
 | **가게** | | | | |
-| GET | [`/stores`](#stores-list) | 주변 가게 목록·검색·필터 | 🔓 | 주변 탐색, 검색 결과 |
-| GET | [`/stores/{storeId}`](#stores-detail) | 가게 상세 | 🔓 | 식당 상세 |
-| GET | [`/stores/{storeId}/menus`](#stores-menus) | 메뉴 목록 | 🔓 | 식당 상세 › 메뉴 |
-| GET | [`/stores/{storeId}/benefits`](#stores-benefits) | 가게 혜택 목록 | 🔓 | 식당 상세 › 혜택 |
+| GET | [`/stores`](#stores-list) | 주변 가게 목록·검색·필터 | 공개 | 주변 탐색, 검색 결과 |
+| GET | [`/stores/{storeId}`](#stores-detail) | 가게 상세 | 공개 | 식당 상세 |
+| GET | [`/stores/{storeId}/menus`](#stores-menus) | 메뉴 목록 | 공개 | 식당 상세 › 메뉴 |
+| GET | [`/stores/{storeId}/benefits`](#stores-benefits) | 가게 혜택 목록 | 공개 | 식당 상세 › 혜택 |
 | **혜택** | | | | |
-| GET | [`/benefits`](#benefits-list) | 주변 혜택 목록 | 🔓 | 혜택·이벤트 |
-| GET | [`/benefits/{benefitId}`](#benefits-detail) | 혜택 상세 | 🔓 | 혜택·이벤트, 식당 상세 |
+| GET | [`/benefits`](#benefits-list) | 주변 혜택 목록 | 공개 | 혜택·이벤트 |
+| GET | [`/benefits/{benefitId}`](#benefits-detail) | 혜택 상세 | 공개 | 혜택·이벤트, 식당 상세 |
 | **저장** | | | | |
-| POST | [`/stores/{storeId}/bookmark`](#bookmark-add) | 가게 저장 | 🔑 | 상세, 목록 |
-| DELETE | [`/stores/{storeId}/bookmark`](#bookmark-remove) | 저장 취소 | 🔑 | 상세, 목록 |
-| GET | [`/members/me/bookmarks`](#bookmark-list) | 내 저장 목록 | 🔑 | 저장 |
+| POST | [`/stores/{storeId}/bookmark`](#bookmark-add) | 가게 저장 | 로그인 | 상세, 목록 |
+| DELETE | [`/stores/{storeId}/bookmark`](#bookmark-remove) | 저장 취소 | 로그인 | 상세, 목록 |
+| GET | [`/members/me/bookmarks`](#bookmark-list) | 내 저장 목록 | 로그인 | 저장 |
 | **사장님 · 가게** | | | | |
-| GET | [`/owner/stores`](#owner-stores) | 내 가게 목록 | 🏪 | 혜택 등록 › 식당 선택 |
-| GET | [`/owner/stores/{storeId}`](#owner-store-get) | 가게 정보 조회 | 🏪 | 사장님 앱 › 가게 |
-| PUT | [`/owner/stores/{storeId}`](#owner-store-put) | 가게 정보 수정 | 🏪 | 사장님 앱 › 가게 |
-| PUT | [`/owner/stores/{storeId}/hours`](#owner-hours) | 영업시간 수정 | 🏪 | 사장님 앱 › 영업시간 |
-| PATCH | [`/owner/stores/{storeId}/business-status`](#owner-status) | 오늘 영업 상태 변경 | 🏪 | 사장님 앱 › 영업 상태 |
+| GET | [`/owner/stores`](#owner-stores) | 내 가게 목록 | 사장님 | 혜택 등록 › 식당 선택 |
+| GET | [`/owner/stores/{storeId}`](#owner-store-get) | 가게 정보 조회 | 사장님 | 사장님 앱 › 가게 |
+| PUT | [`/owner/stores/{storeId}`](#owner-store-put) | 가게 정보 수정 | 사장님 | 사장님 앱 › 가게 |
+| PUT | [`/owner/stores/{storeId}/hours`](#owner-hours) | 영업시간 수정 | 사장님 | 사장님 앱 › 영업시간 |
+| PATCH | [`/owner/stores/{storeId}/business-status`](#owner-status) | 오늘 영업 상태 변경 | 사장님 | 사장님 앱 › 영업 상태 |
 | **사장님 · 메뉴** | | | | |
-| GET | [`/owner/stores/{storeId}/menus`](#owner-menus) | 메뉴 목록 | 🏪 | 사장님 앱 › 메뉴 |
-| POST | [`/owner/stores/{storeId}/menus`](#owner-menus) | 메뉴 추가 | 🏪 | 〃 |
-| PUT | [`/owner/stores/{storeId}/menus/{menuId}`](#owner-menus) | 메뉴 수정 | 🏪 | 〃 |
-| DELETE | [`/owner/stores/{storeId}/menus/{menuId}`](#owner-menus) | 메뉴 삭제 | 🏪 | 〃 |
-| PATCH | [`/owner/stores/{storeId}/menus/{menuId}/sold-out`](#owner-menus) | 품절 표시 | 🏪 | 〃 |
+| GET | [`/owner/stores/{storeId}/menus`](#owner-menus) | 메뉴 목록 | 사장님 | 사장님 앱 › 메뉴 |
+| POST | [`/owner/stores/{storeId}/menus`](#owner-menus) | 메뉴 추가 | 사장님 | 〃 |
+| PUT | [`/owner/stores/{storeId}/menus/{menuId}`](#owner-menus) | 메뉴 수정 | 사장님 | 〃 |
+| DELETE | [`/owner/stores/{storeId}/menus/{menuId}`](#owner-menus) | 메뉴 삭제 | 사장님 | 〃 |
+| PATCH | [`/owner/stores/{storeId}/menus/{menuId}/sold-out`](#owner-menus) | 품절 표시 | 사장님 | 〃 |
 | **사장님 · 혜택** | | | | |
-| POST | [`/owner/stores/{storeId}/benefits`](#owner-benefit-create) | 혜택 등록 신청 | 🏪 | 혜택 등록 |
-| GET | [`/owner/stores/{storeId}/benefits`](#owner-benefit-list) | 내 가게 혜택 목록 | 🏪 | 사장님 앱 › 혜택 |
-| GET | [`/owner/stores/{storeId}/benefits/{benefitId}`](#owner-benefit-list) | 혜택 상세 (사장님용) | 🏪 | 〃 |
-| PUT | [`/owner/stores/{storeId}/benefits/{benefitId}`](#owner-benefit-edit) | 혜택 수정 (다시 검토) | 🏪 | 〃 |
-| PATCH | [`/owner/stores/{storeId}/benefits/{benefitId}/pause`](#owner-benefit-edit) | 노출 중지·재개 | 🏪 | 〃 |
-| DELETE | [`/owner/stores/{storeId}/benefits/{benefitId}`](#owner-benefit-edit) | 혜택 삭제 | 🏪 | 〃 |
+| POST | [`/owner/stores/{storeId}/benefits`](#owner-benefit-create) | 혜택 등록 신청 | 사장님 | 혜택 등록 |
+| GET | [`/owner/stores/{storeId}/benefits`](#owner-benefit-list) | 내 가게 혜택 목록 | 사장님 | 사장님 앱 › 혜택 |
+| GET | [`/owner/stores/{storeId}/benefits/{benefitId}`](#owner-benefit-list) | 혜택 상세 (사장님용) | 사장님 | 〃 |
+| PUT | [`/owner/stores/{storeId}/benefits/{benefitId}`](#owner-benefit-edit) | 혜택 수정 (다시 검토) | 사장님 | 〃 |
+| PATCH | [`/owner/stores/{storeId}/benefits/{benefitId}/pause`](#owner-benefit-edit) | 노출 중지·재개 | 사장님 | 〃 |
+| DELETE | [`/owner/stores/{storeId}/benefits/{benefitId}`](#owner-benefit-edit) | 혜택 삭제 | 사장님 | 〃 |
 | **업로드** | | | | |
-| POST | [`/uploads/images`](#upload) | 이미지 업로드 | 🏪 | 사장님 앱 › 사진 |
+| POST | [`/uploads/images`](#upload) | 이미지 업로드 | 사장님 | 사장님 앱 › 사진 |
 
 ### 범위
 
@@ -75,7 +75,7 @@
 | 좌표 | `lat` 위도, `lng` 경도 |
 | 목록 요청 | `page` (0부터, 기본 0), `size` (기본 20, 최대 100) |
 
-🔓 API에 토큰을 함께 보내면 `bookmarked`처럼 로그인한 사람 기준 값이 채워진다. 토큰이 없으면 `false`.
+공개 API에 토큰을 함께 보내면 `bookmarked`처럼 로그인한 사람 기준 값이 채워진다. 토큰이 없으면 `false`.
 
 **응답 형식** — 모든 API가 같은 틀을 쓴다. 아래 각 API의 응답 예시는 `data` 안의 내용만 적었다.
 
@@ -125,7 +125,7 @@
 로그인 흐름: 앱이 카카오 SDK로 로그인 → 카카오 액세스 토큰을 서버에 전달 → 서버가 카카오에 확인 → 서버 자체 토큰 발급. 처음 로그인하면 자동 가입. accessToken 1시간, refreshToken 14일.
 
 <a id="auth-kakao"></a>
-### POST /auth/kakao — 카카오 로그인 🔓
+### POST /auth/kakao — 카카오 로그인 (공개)
 
 | 필드 | 타입 | 필수 | 설명 |
 |---|---|:-:|---|
@@ -148,7 +148,7 @@
 에러: `KAKAO_AUTH_FAILED`
 
 <a id="auth-refresh"></a>
-### POST /auth/refresh — 토큰 재발급 🔓
+### POST /auth/refresh — 토큰 재발급 (공개)
 
 | 필드 | 타입 | 필수 |
 |---|---|:-:|
@@ -158,12 +158,12 @@
 - 에러: `INVALID_TOKEN`, `EXPIRED_TOKEN` → 카카오 로그인부터 다시
 
 <a id="auth-logout"></a>
-### POST /auth/logout — 로그아웃 🔑
+### POST /auth/logout — 로그아웃 (로그인)
 
 요청 본문 없음. 이 기기의 refreshToken을 폐기한다. 응답 `data`: `null`
 
 <a id="members-me"></a>
-### GET /members/me — 내 정보 🔑
+### GET /members/me — 내 정보 (로그인)
 
 <details>
 <summary>응답 예시</summary>
@@ -183,14 +183,14 @@
 - `ownedStoreCount`가 1 이상이면 마이 화면에 사장님 메뉴 표시
 
 <a id="members-fcm"></a>
-### PATCH /members/me/fcm-token — 푸시 토큰 갱신 🔑
+### PATCH /members/me/fcm-token — 푸시 토큰 갱신 (로그인)
 
 | 필드 | 타입 | 필수 |
 |---|---|:-:|
 | fcmToken | string | O |
 
 <a id="members-delete"></a>
-### DELETE /members/me — 회원 탈퇴 🔑
+### DELETE /members/me — 회원 탈퇴 (로그인)
 
 - 저장한 가게와 토큰을 함께 삭제
 - 사장님으로 연결된 가게가 있으면 `OWNER_HAS_STORE` (운영진에게 연결 해제 요청)
@@ -200,7 +200,7 @@
 ## 가게
 
 <a id="stores-list"></a>
-### GET /stores — 주변 가게 목록·검색 🔓
+### GET /stores — 주변 가게 목록·검색 (공개)
 
 화면: 주변 탐색 (지도 마커 + 하단 목록), 검색 결과. "이 지역 다시 찾기"는 지도 중심 좌표로 다시 호출.
 
@@ -241,7 +241,7 @@
 - `businessStatus`: [영업 상태](#code-status). "지금 영업 중인 24곳"은 `openNow=true`의 `totalElements`
 
 <a id="stores-detail"></a>
-### GET /stores/{storeId} — 가게 상세 🔓
+### GET /stores/{storeId} — 가게 상세 (공개)
 
 화면: 식당 상세 (정보 탭, 대표 메뉴, 챙겨가는 혜택)
 
@@ -308,7 +308,7 @@
 - 에러: `STORE_NOT_FOUND`
 
 <a id="stores-menus"></a>
-### GET /stores/{storeId}/menus — 메뉴 목록 🔓
+### GET /stores/{storeId}/menus — 메뉴 목록 (공개)
 
 화면: 식당 상세 › 메뉴 탭, "전체 메뉴 8". 대표 메뉴 먼저, 그다음 등록 순. 페이지 없음.
 
@@ -329,7 +329,7 @@
 </details>
 
 <a id="stores-benefits"></a>
-### GET /stores/{storeId}/benefits — 가게 혜택 목록 🔓
+### GET /stores/{storeId}/benefits — 가게 혜택 목록 (공개)
 
 화면: 식당 상세 › 혜택 탭. [혜택 상세](#benefits-detail) 객체의 배열. 지금 노출 중인 혜택만 (승인 완료, 기간 안, 사장님이 중지하지 않은 것).
 
@@ -338,7 +338,7 @@
 ## 혜택
 
 <a id="benefits-list"></a>
-### GET /benefits — 주변 혜택 목록 🔓
+### GET /benefits — 주변 혜택 목록 (공개)
 
 화면: 혜택·이벤트 탭 "지금, 내 주변 혜택"
 
@@ -379,7 +379,7 @@
 - "제휴 식당 12곳" 배너 숫자는 `partner=true`의 `totalElements`
 
 <a id="benefits-detail"></a>
-### GET /benefits/{benefitId} — 혜택 상세 🔓
+### GET /benefits/{benefitId} — 혜택 상세 (공개)
 
 <details>
 <summary>응답 예시</summary>
@@ -424,17 +424,17 @@
 ## 저장
 
 <a id="bookmark-add"></a>
-### POST /stores/{storeId}/bookmark — 가게 저장 🔑
+### POST /stores/{storeId}/bookmark — 가게 저장 (로그인)
 
 이미 저장한 가게여도 성공 (중복 저장 안 됨). 응답 `data`: `{ "bookmarked": true }`
 
 <a id="bookmark-remove"></a>
-### DELETE /stores/{storeId}/bookmark — 저장 취소 🔑
+### DELETE /stores/{storeId}/bookmark — 저장 취소 (로그인)
 
 저장하지 않은 가게여도 성공. 응답 `data`: `{ "bookmarked": false }`
 
 <a id="bookmark-list"></a>
-### GET /members/me/bookmarks — 내 저장 목록 🔑
+### GET /members/me/bookmarks — 내 저장 목록 (로그인)
 
 화면: 저장 탭
 
@@ -452,10 +452,10 @@
 
 ## 사장님
 
-모든 API 🏪. `{storeId}`가 본인 가게가 아니면 `NOT_STORE_OWNER` (403). 사장님 계정과 가게 연결은 1차에서 운영진이 직접 처리한다.
+모든 API 사장님 로그인 필요. `{storeId}`가 본인 가게가 아니면 `NOT_STORE_OWNER` (403). 사장님 계정과 가게 연결은 1차에서 운영진이 직접 처리한다.
 
 <a id="owner-stores"></a>
-### GET /owner/stores — 내 가게 목록 🏪
+### GET /owner/stores — 내 가게 목록 (사장님)
 
 <details>
 <summary>응답 예시 (배열 항목)</summary>
@@ -472,12 +472,12 @@
 </details>
 
 <a id="owner-store-get"></a>
-### GET /owner/stores/{storeId} — 가게 정보 조회 🏪
+### GET /owner/stores/{storeId} — 가게 정보 조회 (사장님)
 
 [가게 상세](#stores-detail) 형식 + 사장님 전용 필드 `businessStatusOverride` ([영업 상태 변경](#owner-status) 참고)
 
 <a id="owner-store-put"></a>
-### PUT /owner/stores/{storeId} — 가게 정보 수정 🏪
+### PUT /owner/stores/{storeId} — 가게 정보 수정 (사장님)
 
 | 필드 | 타입 | 필수 | 제약 |
 |---|---|:-:|---|
@@ -493,7 +493,7 @@
 응답: [가게 정보 조회](#owner-store-get)와 같은 형식
 
 <a id="owner-hours"></a>
-### PUT /owner/stores/{storeId}/hours — 영업시간 수정 🏪
+### PUT /owner/stores/{storeId}/hours — 영업시간 수정 (사장님)
 
 | 필드 | 타입 | 필수 | 설명 |
 |---|---|:-:|---|
@@ -505,7 +505,7 @@
 사장님 앱은 요일을 숫자(1=월 ~ 7=일)로 가지고 있으므로 보낼 때 요일 코드로 바꾼다.
 
 <a id="owner-status"></a>
-### PATCH /owner/stores/{storeId}/business-status — 오늘 영업 상태 변경 🏪
+### PATCH /owner/stores/{storeId}/business-status — 오늘 영업 상태 변경 (사장님)
 
 화면: 사장님 앱 › 영업 상태 (영업 중 / 준비 중 / 오늘 휴무)
 
@@ -518,7 +518,7 @@
 - 응답: `{ "businessStatus": "CLOSED", "businessStatusOverride": "CLOSED" }`
 
 <a id="owner-menus"></a>
-### 메뉴 관리 🏪
+### 메뉴 관리 (사장님)
 
 | 메서드 | 경로 | 설명 |
 |---|---|---|
@@ -541,7 +541,7 @@
 응답: 메뉴 객체. 에러: `MENU_NOT_FOUND`
 
 <a id="owner-benefit-create"></a>
-### POST /owner/stores/{storeId}/benefits — 혜택 등록 신청 🏪
+### POST /owner/stores/{storeId}/benefits — 혜택 등록 신청 (사장님)
 
 화면: 혜택 등록 › "혜택 등록 신청하기". 신청하면 `PENDING`(검토 중), 운영진이 승인하면 손님에게 노출. "임시저장"은 앱 기기에 저장 (서버 저장 없음).
 
@@ -568,7 +568,7 @@
 응답: [내 가게 혜택 목록](#owner-benefit-list) 항목 1개 (`status: "PENDING"`)
 
 <a id="owner-benefit-list"></a>
-### GET /owner/stores/{storeId}/benefits — 내 가게 혜택 목록 🏪
+### GET /owner/stores/{storeId}/benefits — 내 가게 혜택 목록 (사장님)
 
 <details>
 <summary>응답 예시 (배열 항목)</summary>
@@ -594,7 +594,7 @@
 - 상세 `GET /owner/stores/{storeId}/benefits/{benefitId}`: [혜택 상세](#benefits-detail) 형식 + `contactPhone`, `status`, `rejectReason`, `paused`
 
 <a id="owner-benefit-edit"></a>
-### 혜택 수정·중지·삭제 🏪
+### 혜택 수정·중지·삭제 (사장님)
 
 | 메서드 | 경로 | 설명 |
 |---|---|---|
@@ -609,7 +609,7 @@
 ## 업로드
 
 <a id="upload"></a>
-### POST /uploads/images — 이미지 업로드 🏪
+### POST /uploads/images — 이미지 업로드 (사장님)
 
 `multipart/form-data`
 
@@ -691,7 +691,7 @@
 |---|---|---|
 | 400 | INVALID_INPUT | 필수값 누락, 형식·길이 오류 (`fields`에 상세) |
 | 400 | INVALID_FILE | 지원하지 않는 이미지 형식 |
-| 401 | UNAUTHORIZED | 토큰 없음 (🔑·🏪 API) |
+| 401 | UNAUTHORIZED | 토큰 없음 (로그인·사장님 API) |
 | 401 | INVALID_TOKEN | 잘못된 토큰 |
 | 401 | EXPIRED_TOKEN | accessToken 만료 → [토큰 재발급](#auth-refresh) |
 | 401 | KAKAO_AUTH_FAILED | 카카오 토큰 확인 실패 |
